@@ -1,1 +1,44 @@
 #Add your own cookies put here
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.youtube.com	TRUE	/	FALSE	1769175359	HSID	AiPtUr84vMfPqjjLE
+.youtube.com	TRUE	/	TRUE	1769175359	SSID	AcBfgiGcRHU13Zp5s
+.youtube.com	TRUE	/	FALSE	1769175359	APISID	4LPbjYqzuVgiS-Ok/AdpxzSzuXsKifHIeA
+.youtube.com	TRUE	/	TRUE	1769175359	SAPISID	vKyhnW1WMfBiay-3/AttFZQz8XcjJqxRTG
+.youtube.com	TRUE	/	TRUE	1769175359	__Secure-1PAPISID	vKyhnW1WMfBiay-3/AttFZQz8XcjJqxRTG
+.youtube.com	TRUE	/	TRUE	1769175359	__Secure-3PAPISID	vKyhnW1WMfBiay-3/AttFZQz8XcjJqxRTG
+.youtube.com	TRUE	/	TRUE	1766322254	LOGIN_INFO	AFmmF2swRgIhAIidWc-TvnIxmZ6ntCwZDu77Ho3dlQNKZraJJ4j_5YDsAiEArCUQ8AoT-z2TGXgIMPAVF1kWsiVROfweLqsvCFBoFsg:QUQ3MjNmeHlkUWZWbGFWcTktZFhOdDU1YUR2eUNUVGp4b0NBX0VkQW5Db0Z2ajZ0Mkk5dVNJMXoxQXJGZFVGNndieGE0eEJjWlNKTVh5WUU1Q3BkNm9RaWRfeTU0Q1p1ME1nVTVnMV96UlpJUmliRTZidXp2ZUdfOTlQTVF6TlUyVVNkTkZlbmxtYWNhc3MyZGt0ZWlpdUdhQTBHWnV3Q1p3
+.youtube.com	TRUE	/	FALSE	1769175359	SID	g.a000zgiciE4dmeUC13ByqvSUvK3kosj4rdI4HfageKtHi6ohUXrAZ_wXyxOLZsIx2tn3fzZpDgACgYKAQYSARcSFQHGX2Mi1Wm5Mt7ZI2VLIviXvIFITRoVAUF8yKqKyqCfCBmmNL8tChP94aSJ0076
+.youtube.com	TRUE	/	TRUE	1769175359	__Secure-1PSID	g.a000zgiciE4dmeUC13ByqvSUvK3kosj4rdI4HfageKtHi6ohUXrApMhYdA4hMr2qOvsebECaSAACgYKAaUSARcSFQHGX2MivlrHp_Fm6gPzjDOK1G62CRoVAUF8yKoLKYwVB9hoGd127StByuYH0076
+.youtube.com	TRUE	/	TRUE	1769175359	__Secure-3PSID	g.a000zgiciE4dmeUC13ByqvSUvK3kosj4rdI4HfageKtHi6ohUXrApq3J-tzsHPCDwZIoW13kEwACgYKASkSARcSFQHGX2MibeXBI1FrTQF4DATlCxHxuRoVAUF8yKr72hTahcuSwrXwqXkHXfLd0076
+.youtube.com	TRUE	/	TRUE	1756136348	PREF	f4=4000000&f6=40000000&tz=Asia.Calcutta&f7=100&f5=30000
+.youtube.com	TRUE	/	TRUE	0	wide	0
+.youtube.com	TRUE	/	TRUE	1771083070	NID	525=XfE5gbf5nUhQV88qC3Vzieppmnx9wdTbIkuWIb6KTA0Tasqi-qyvw0DKQQFM81kqrkeYc0SaruKt_pIVbuYdJCrrPQedDSB0Fczou8ECPsog_1TGChJA0S27FEvEezIZ5fJBqcGQFFkKKI7O1jtAmH6yEEFbvAgplCYnky5h5YU27u0mD-dQQqVZKFnnQuSfXv7uYw3UxHFrUqH587itMvg-PZ1sdg
+.youtube.com	TRUE	/	TRUE	1771089125	__Secure-1PSIDTS	sidts-CjIB5H03P1TImxcfI5KFOq5Urcrswi1EKXXX_3tPU_JRTwE5nRQMUIt3XfOaCLxf1cUGHhAA
+.youtube.com	TRUE	/	TRUE	1771089125	__Secure-3PSIDTS	sidts-CjIB5H03P1TImxcfI5KFOq5Urcrswi1EKXXX_3tPU_JRTwE5nRQMUIt3XfOaCLxf1cUGHhAA
+.youtube.com	TRUE	/	FALSE	1771089125	SIDCC	AKEyXzVdjHwt9e1XRBx-wQyrk97cyqpwEs5cjHuKNScLMuD5xn4sVkDQpTTBw6EYZUsiD9th8g
+.youtube.com	TRUE	/	TRUE	1771089125	__Secure-1PSIDCC	AKEyXzVXfQ8f4GhdqzocTqbS5kUQkVhTB_duoQcg4dxArW3LzxiXC4b0riPzoSiPVRydUql7--E
+.youtube.com	TRUE	/	TRUE	1771089125	__Secure-3PSIDCC	AKEyXzUwDN2baQT7eF1VJpepWs6NedYImxjQeD_u-_ib8fagCt-MgFBgZIWAUjboNwRbZoxHJEg
+.youtube.com	TRUE	/	TRUE	1771083523	VISITOR_INFO1_LIVE	gtlRdrXbvhM
+.youtube.com	TRUE	/	TRUE	1771083523	VISITOR_PRIVACY_METADATA	CgJJThIEGgAgZg%3D%3D
+.youtube.com	TRUE	/	TRUE	1770999148	__Secure-ROLLOUT_TOKEN	CLvIuPf90dX8aRC_16DcjoqOAxiQlLmanpKPAw%3D%3D
+.youtube.com	TRUE	/	TRUE	0	YSC	dIosMDOZJPk
+
+#inatagram cookies
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.instagram.com	TRUE	/	TRUE	1771089813	csrftoken	3PFtNkJR5sE2mqSoEKpu6s
+.instagram.com	TRUE	/	TRUE	1769439778	datr	8zOKaOEp5ooI89BlfJuEC1qO
+.instagram.com	TRUE	/	TRUE	1769439778	ig_did	CD244CBF-421A-4100-B126-EE22B16FA243
+.instagram.com	TRUE	/	TRUE	1756142611	dpr	1.25
+.instagram.com	TRUE	/	TRUE	1755877273	mid	aJ9VFAALAAFg36u-lwLSft45IyOq
+.instagram.com	TRUE	/	TRUE	1763313813	ds_user_id	49657193268
+.instagram.com	TRUE	/	TRUE	1770824532	ps_l	1
+.instagram.com	TRUE	/	TRUE	1770824532	ps_n	1
+.instagram.com	TRUE	/	TRUE	1756142611	wd	1536x735
+.instagram.com	TRUE	/	TRUE	0	rur	"CLN\05449657193268\0541787073811:01fe518e8ea6cf7a191fd0ded3c3c083b17b4bbcf96a7d0ea0733d7900ba70cf81b50842"
+.instagram.com	TRUE	/	TRUE	1771089813	sessionid	49657193268%3A4uDplKev9efgNe%3A7%3AAYe_9SnA20ql5o6_5XvPlfrAfZ7RGuLQzBVVIBUzVg
