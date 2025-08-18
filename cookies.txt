@@ -1,8 +1,6 @@
-#Add your own cookies put here
 # Netscape HTTP Cookie File
 # http://curl.haxx.se/rfc/cookie_spec.html
 # This is a generated file!  Do not edit.
-
 .youtube.com	TRUE	/	FALSE	1769175359	HSID	AiPtUr84vMfPqjjLE
 .youtube.com	TRUE	/	TRUE	1769175359	SSID	AcBfgiGcRHU13Zp5s
 .youtube.com	TRUE	/	FALSE	1769175359	APISID	4LPbjYqzuVgiS-Ok/AdpxzSzuXsKifHIeA
@@ -25,12 +23,9 @@
 .youtube.com	TRUE	/	TRUE	1771083523	VISITOR_PRIVACY_METADATA	CgJJThIEGgAgZg%3D%3D
 .youtube.com	TRUE	/	TRUE	1770999148	__Secure-ROLLOUT_TOKEN	CLvIuPf90dX8aRC_16DcjoqOAxiQlLmanpKPAw%3D%3D
 .youtube.com	TRUE	/	TRUE	0	YSC	dIosMDOZJPk
-
-#inatagram cookies
 # Netscape HTTP Cookie File
 # http://curl.haxx.se/rfc/cookie_spec.html
 # This is a generated file!  Do not edit.
-
 .instagram.com	TRUE	/	TRUE	1771089813	csrftoken	3PFtNkJR5sE2mqSoEKpu6s
 .instagram.com	TRUE	/	TRUE	1769439778	datr	8zOKaOEp5ooI89BlfJuEC1qO
 .instagram.com	TRUE	/	TRUE	1769439778	ig_did	CD244CBF-421A-4100-B126-EE22B16FA243
