@@ -35,6 +35,8 @@ cookies_file = 'cookies.txt'
 
 @Client.on_message(filters.private & filters.regex(pattern=".*http.*"))
 async def echo(bot, update):
+    if "terabox.com" in update.text or "terabox.app" in update.text:
+        return
     if update.from_user.id != Config.OWNER_ID:  
         if not await check_verification(bot, update.from_user.id) and Config.TRUE_OR_FALSE:
             button = [[
