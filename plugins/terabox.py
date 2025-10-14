@@ -41,8 +41,8 @@ async def terabox_downloader(bot, update):
     terabox = TeraboxDL(cookie)
     sent_message = await update.reply_text("Fetching download link...")
 
-        loop = asyncio.get_event_loop()
-        file_info = await loop.run_in_executor(None, terabox.get_file_info, update.text, True)
+    loop = asyncio.get_running_loop()
+    file_info = await loop.run_in_executor(None, terabox.get_file_info, update.text, True)
 
     if "error" in file_info:
         await sent_message.edit(f"Error: {file_info['error']}")
