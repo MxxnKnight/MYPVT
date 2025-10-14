@@ -60,6 +60,13 @@ class Database:
         user = await self.col.find_one({'id': int(id)})
         return user.get('thumbnail', None)
 
+    async def set_terabox_cookie(self, id, cookie):
+        await self.col.update_one({'id': id}, {'$set': {'terabox_cookie': cookie}})
+
+    async def get_terabox_cookie(self, id):
+        user = await self.col.find_one({'id': int(id)})
+        return user.get('terabox_cookie', None)
+
     async def set_caption(self, id, caption):
         await self.col.update_one({'id': id}, {'$set': {'caption': caption}})
 
