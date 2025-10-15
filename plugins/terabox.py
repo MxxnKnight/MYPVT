@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(filters.private & filters.command("set_cookie"))
 async def set_cookie_handler(bot, update):
+    logger.info(f"User {update.from_user.id} initiated /set_cookie command.")
     await update.reply_text(
         "Please send me your Terabox cookie. For instructions on how to get it, please see the documentation for the `terabox-downloader` library."
     )
@@ -33,7 +34,9 @@ async def set_cookie_handler(bot, update):
 async def handle_cookie_reply(bot, update):
     if update.reply_to_message.text.startswith("Please send me your Terabox cookie"):
         cookie = update.text
+        logger.info(f"Received cookie from user {update.from_user.id}.")
         await db.set_terabox_cookie(update.from_user.id, cookie)
+        logger.info(f"Successfully saved cookie for user {update.from_user.id}.")
         await update.reply_text("Your Terabox cookie has been saved.")
 
 @Client.on_message(filters.private & filters.regex(r"https?://(?:www\.)?(?:terabox\.com|terabox\.app)\S+"))
@@ -45,7 +48,7 @@ async def terabox_downloader(bot, update):
         await update.reply_text("You have not set your Terabox cookie yet. Please use the /set_cookie command to set it.")
         return
 
-    logger.info(f"Using cookie for user {update.from_user.id}: {cookie}")
+    logger.info(f"Using cookie for user {update.from_user.id}.")
     terabox = TeraboxDL(cookie)
     sent_message = await update.reply_text("Fetching download link...")
 
@@ -97,39 +100,46 @@ async def terabox_downloader(bot, update):
     if os.path.exists(download_directory):
         start_time = time.time()
         thumb_image_path = None
-        if (await db.get_upload_as_doc(update.from_user.id)) is False:
-            thumbnail = await Gthumb01(bot, update)
-            await bot.send_document(
-                chat_id=update.chat.id,
-                document=download_directory,
-                thumb=thumbnail,
-                caption=custom_file_name,
-                progress=progress_for_pyrogram,
-                progress_args=(
-                    "Uploading...",
-                    sent_message,
-                    start_time
+        try:
+            if (await db.get_upload_as_doc(update.from_user.id)) is False:
+                logger.info(f"Uploading document for user {update.from_user.id}: {download_directory}")
+                thumbnail = await Gthumb01(bot, update)
+                await bot.send_document(
+                    chat_id=update.chat.id,
+                    document=download_directory,
+                    thumb=thumbnail,
+                    caption=custom_file_name,
+                    progress=progress_for_pyrogram,
+                    progress_args=(
+                        "Uploading...",
+                        sent_message,
+                        start_time
+                    )
                 )
-            )
-        else:
-             width, height, duration = await Mdata01(download_directory)
-             thumb_image_path = await Gthumb02(bot, update, duration, download_directory)
-             await bot.send_video(
-                chat_id=update.chat.id,
-                video=download_directory,
-                caption=custom_file_name,
-                duration=duration,
-                width=width,
-                height=height,
-                supports_streaming=True,
-                thumb=thumb_image_path,
-                progress=progress_for_pyrogram,
-                progress_args=(
-                    "Uploading...",
-                    sent_message,
-                    start_time
+            else:
+                logger.info(f"Uploading video for user {update.from_user.id}: {download_directory}")
+                width, height, duration = await Mdata01(download_directory)
+                thumb_image_path = await Gthumb02(bot, update, duration, download_directory)
+                await bot.send_video(
+                    chat_id=update.chat.id,
+                    video=download_directory,
+                    caption=custom_file_name,
+                    duration=duration,
+                    width=width,
+                    height=height,
+                    supports_streaming=True,
+                    thumb=thumb_image_path,
+                    progress=progress_for_pyrogram,
+                    progress_args=(
+                        "Uploading...",
+                        sent_message,
+                        start_time
+                    )
                 )
-            )
+            logger.info(f"Successfully uploaded file for user {update.from_user.id}.")
+        except Exception as e:
+            logger.error(f"Error uploading file for user {update.from_user.id}: {e}", exc_info=True)
+            await sent_message.edit("An error occurred during file upload. Please check the logs for details.")
         try:
             os.remove(download_directory)
             if thumb_image_path and os.path.exists(thumb_image_path):
