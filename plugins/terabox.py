@@ -63,6 +63,7 @@ async def terabox_downloader(bot, update):
             return
 
         all_files = folder.flatten_files()
+        logger.info(f"Found a total of {len(all_files)} files to download.")
 
         if not all_files:
             await sent_message.edit("No files found in the provided link.")
@@ -72,9 +73,11 @@ async def terabox_downloader(bot, update):
 
         for i, file_info in enumerate(all_files):
             file_number = i + 1
+            custom_file_name = file_info["name"]
+            logger.info(f"Processing file {file_number}/{len(all_files)}: {custom_file_name}")
 
             try:
-                await sent_message.edit(f"Downloading file {file_number} of {len(all_files)}: `{file_info['name']}`")
+                await sent_message.edit(f"Downloading file {file_number} of {len(all_files)}: `{custom_file_name}`")
 
                 link_generator = TeraboxLink(
                     fs_id=str(file_info['fs_id']),
