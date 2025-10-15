@@ -3,7 +3,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from plugins.config import Config
 from plugins.database.database import db
-from TeraboxDL import TeraboxDL
+from plugins.terabox_utils import TeraboxFolder, TeraboxLink
 from plugins.dl_button import download_coroutine
 import aiohttp
 import asyncio
@@ -48,104 +48,131 @@ async def terabox_downloader(bot, update):
         await update.reply_text("You have not set your Terabox cookie yet. Please use the /set_cookie command to set it.")
         return
 
-    logger.info(f"Using cookie for user {update.from_user.id}.")
-    terabox = TeraboxDL(cookie)
-    sent_message = await update.reply_text("Fetching download link...")
+    sent_message = await update.reply_text("Processing link, please wait...")
 
     loop = asyncio.get_running_loop()
     try:
-        file_info = await loop.run_in_executor(None, terabox.get_file_info, update.text, True)
-        logger.info(f"File info for user {update.from_user.id}: {file_info}")
+        folder = TeraboxFolder()
+        await loop.run_in_executor(None, folder.search, update.text)
+
+        # Inject the user's cookie
+        folder.result['cookie'] = cookie
+
+        if folder.result['status'] == 'failed':
+            await sent_message.edit("Failed to retrieve file information. The link might be invalid or expired.")
+            return
+
+        all_files = folder.flatten_files()
+
+        if not all_files:
+            await sent_message.edit("No files found in the provided link.")
+            return
+
+        await sent_message.edit(f"Found {len(all_files)} file(s). Starting download...")
+
+        for i, file_info in enumerate(all_files):
+            file_number = i + 1
+
+            try:
+                await sent_message.edit(f"Downloading file {file_number} of {len(all_files)}: `{file_info['name']}`")
+
+                link_generator = TeraboxLink(
+                    fs_id=str(file_info['fs_id']),
+                    uk=str(folder.result['uk']),
+                    shareid=str(folder.result['shareid']),
+                    timestamp=str(folder.result['timestamp']),
+                    sign=str(folder.result['sign']),
+                    js_token=str(folder.result['js_token']),
+                    cookie=str(folder.result['cookie'])
+                )
+                await loop.run_in_executor(None, link_generator.generate)
+
+                if link_generator.result['status'] == 'failed':
+                    logger.error(f"Failed to get download link for {file_info['name']}")
+                    await bot.send_message(update.chat.id, f"Could not get download link for `{file_info['name']}`. Skipping.")
+                    continue
+
+                download_link = link_generator.result['download_link']
+                custom_file_name = file_info["name"]
+
+                tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
+                if not os.path.isdir(tmp_directory_for_each_user):
+                    os.makedirs(tmp_directory_for_each_user)
+                download_directory = tmp_directory_for_each_user + "/" + custom_file_name
+
+                async with aiohttp.ClientSession() as session:
+                    c_time = time.time()
+                    try:
+                        await download_coroutine(
+                            bot,
+                            session,
+                            download_link,
+                            download_directory,
+                            update.chat.id,
+                            sent_message.id,
+                            c_time
+                        )
+                    except asyncio.TimeoutError:
+                        await sent_message.edit(f"Download timed out for `{custom_file_name}`.")
+                        continue
+
+                if os.path.exists(download_directory):
+                    start_time = time.time()
+                    thumb_image_path = None
+                    try:
+                        await sent_message.edit(f"Uploading file {file_number} of {len(all_files)}: `{custom_file_name}`")
+                        if (await db.get_upload_as_doc(update.from_user.id)) is False:
+                            thumbnail = await Gthumb01(bot, update)
+                            await bot.send_document(
+                                chat_id=update.chat.id,
+                                document=download_directory,
+                                thumb=thumbnail,
+                                caption=custom_file_name,
+                                progress=progress_for_pyrogram,
+                                progress_args=(
+                                    f"Uploading: {custom_file_name}",
+                                    sent_message,
+                                    start_time
+                                )
+                            )
+                        else:
+                            width, height, duration = await Mdata01(download_directory)
+                            thumb_image_path = await Gthumb02(bot, update, duration, download_directory)
+                            await bot.send_video(
+                                chat_id=update.chat.id,
+                                video=download_directory,
+                                caption=custom_file_name,
+                                duration=duration,
+                                width=width,
+                                height=height,
+                                supports_streaming=True,
+                                thumb=thumb_image_path,
+                                progress=progress_for_pyrogram,
+                                progress_args=(
+                                    f"Uploading: {custom_file_name}",
+                                    sent_message,
+                                    start_time
+                                )
+                            )
+                        logger.info(f"Successfully uploaded {custom_file_name} for user {update.from_user.id}.")
+                    except Exception as e:
+                        logger.error(f"Error uploading {custom_file_name} for user {update.from_user.id}: {e}", exc_info=True)
+                        await bot.send_message(update.chat.id, f"An error occurred during file upload for `{custom_file_name}`.")
+                    finally:
+                        try:
+                            os.remove(download_directory)
+                            if thumb_image_path and os.path.exists(thumb_image_path):
+                                os.remove(thumb_image_path)
+                        except:
+                            pass
+                else:
+                    await sent_message.edit(f"Download failed for `{custom_file_name}`.")
+            except Exception as e:
+                logger.error(f"An error occurred while processing file {file_info['name']}: {e}", exc_info=True)
+                await bot.send_message(update.chat.id, f"An unexpected error occurred for `{file_info['name']}`. Skipping.")
+                continue
+
+        await sent_message.edit(f"Finished processing all {len(all_files)} files.")
     except Exception as e:
-        logger.error(f"Error getting file info for user {update.from_user.id}: {e}", exc_info=True)
-        await sent_message.edit("An error occurred while fetching file information. Please check the logs for details.")
-        return
-
-    if "error" in file_info:
-        logger.error(f"Error for user {update.from_user.id}: {file_info['error']}")
-        await sent_message.edit(f"Error: {file_info['error']}")
-        return
-
-    download_link = file_info["download_link"]
-    custom_file_name = file_info["file_name"]
-    logger.info(f"Download link for user {update.from_user.id}: {download_link}")
-    logger.info(f"File name for user {update.from_user.id}: {custom_file_name}")
-
-    tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
-    if not os.path.isdir(tmp_directory_for_each_user):
-        os.makedirs(tmp_directory_for_each_user)
-
-    download_directory = tmp_directory_for_each_user + "/" + custom_file_name
-
-    async with aiohttp.ClientSession() as session:
-        c_time = time.time()
-        try:
-            await download_coroutine(
-                bot,
-                session,
-                download_link,
-                download_directory,
-                update.chat.id,
-                sent_message.id,
-                c_time
-            )
-        except asyncio.TimeoutError:
-            await bot.edit_message_text(
-                text="Download timed out.",
-                chat_id=update.chat.id,
-                message_id=sent_message.id
-            )
-            return False
-
-    if os.path.exists(download_directory):
-        start_time = time.time()
-        thumb_image_path = None
-        try:
-            if (await db.get_upload_as_doc(update.from_user.id)) is False:
-                logger.info(f"Uploading document for user {update.from_user.id}: {download_directory}")
-                thumbnail = await Gthumb01(bot, update)
-                await bot.send_document(
-                    chat_id=update.chat.id,
-                    document=download_directory,
-                    thumb=thumbnail,
-                    caption=custom_file_name,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        "Uploading...",
-                        sent_message,
-                        start_time
-                    )
-                )
-            else:
-                logger.info(f"Uploading video for user {update.from_user.id}: {download_directory}")
-                width, height, duration = await Mdata01(download_directory)
-                thumb_image_path = await Gthumb02(bot, update, duration, download_directory)
-                await bot.send_video(
-                    chat_id=update.chat.id,
-                    video=download_directory,
-                    caption=custom_file_name,
-                    duration=duration,
-                    width=width,
-                    height=height,
-                    supports_streaming=True,
-                    thumb=thumb_image_path,
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        "Uploading...",
-                        sent_message,
-                        start_time
-                    )
-                )
-            logger.info(f"Successfully uploaded file for user {update.from_user.id}.")
-        except Exception as e:
-            logger.error(f"Error uploading file for user {update.from_user.id}: {e}", exc_info=True)
-            await sent_message.edit("An error occurred during file upload. Please check the logs for details.")
-        try:
-            os.remove(download_directory)
-            if thumb_image_path and os.path.exists(thumb_image_path):
-                os.remove(thumb_image_path)
-        except:
-            pass
-        await sent_message.delete()
-    else:
-        await sent_message.edit("Download failed.")
+        logger.error(f"A major error occurred in terabox_downloader for user {update.from_user.id}: {e}", exc_info=True)
+        await sent_message.edit("A critical error occurred. Please check the logs for details.")
