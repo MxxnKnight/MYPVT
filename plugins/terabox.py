@@ -1,3 +1,4 @@
+import logging
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from plugins.config import Config
@@ -18,6 +19,10 @@ from plugins.script import Translation
 from plugins.thumbnail import Gthumb01, Mdata01, Gthumb02, Mdata03, Mdata02
 from plugins.dl_button import download_coroutine
 
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 @Client.on_message(filters.private & filters.command("set_cookie"))
 async def set_cookie_handler(bot, update):
     await update.reply_text(
@@ -33,23 +38,35 @@ async def handle_cookie_reply(bot, update):
 
 @Client.on_message(filters.private & filters.regex(r"https?://(?:www\.)?(?:terabox\.com|terabox\.app)\S+"))
 async def terabox_downloader(bot, update):
+    logger.info(f"Received terabox link from user {update.from_user.id}: {update.text}")
     cookie = await db.get_terabox_cookie(update.from_user.id)
     if not cookie:
+        logger.warning(f"User {update.from_user.id} has not set their Terabox cookie.")
         await update.reply_text("You have not set your Terabox cookie yet. Please use the /set_cookie command to set it.")
         return
 
+    logger.info(f"Using cookie for user {update.from_user.id}: {cookie}")
     terabox = TeraboxDL(cookie)
     sent_message = await update.reply_text("Fetching download link...")
 
     loop = asyncio.get_running_loop()
-    file_info = await loop.run_in_executor(None, terabox.get_file_info, update.text, True)
+    try:
+        file_info = await loop.run_in_executor(None, terabox.get_file_info, update.text, True)
+        logger.info(f"File info for user {update.from_user.id}: {file_info}")
+    except Exception as e:
+        logger.error(f"Error getting file info for user {update.from_user.id}: {e}", exc_info=True)
+        await sent_message.edit("An error occurred while fetching file information. Please check the logs for details.")
+        return
 
     if "error" in file_info:
+        logger.error(f"Error for user {update.from_user.id}: {file_info['error']}")
         await sent_message.edit(f"Error: {file_info['error']}")
         return
 
     download_link = file_info["download_link"]
     custom_file_name = file_info["file_name"]
+    logger.info(f"Download link for user {update.from_user.id}: {download_link}")
+    logger.info(f"File name for user {update.from_user.id}: {custom_file_name}")
 
     tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
     if not os.path.isdir(tmp_directory_for_each_user):
