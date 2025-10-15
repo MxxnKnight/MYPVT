@@ -115,6 +115,14 @@ If you have any questions or would like to sponsor this project in another way, 
 
 
 
+### Features
+- Download content from:
+  - Terabox
+  - Pinterest
+  - Twitter
+  - Instagram
+  - Reddit
+
 ### Bot Commands 
 ```
 start – Check if the bot is online 🔔
@@ -127,7 +135,34 @@ broadcast – Send a message to all users 📢
 warn – Issue a warning to a specific user ⚠️
 total – View the total number of users 👥
 status – Check the bot's current status 🚀
+set_cookie - Set your Terabox cookie
 ```
+
+### Usage
+
+**Social Media Downloader**
+
+To download media from Pinterest, Twitter, Instagram, or Reddit, simply send a valid URL to the bot. The bot will automatically detect the platform and start the download.
+
+**Terabox Downloader**
+
+The Terabox downloader requires a user-specific cookie to function.
+
+**How to get your Terabox cookie:**
+
+1. Open your web browser and log in to your Terabox account.
+2. Open the developer tools (usually by pressing F12).
+3. Go to the "Application" tab (in Chrome) or "Storage" tab (in Firefox).
+4. Find the "Cookies" section and select the Terabox domain.
+5. Find the `ndus` cookie and copy its value.
+
+**How to set your cookie in the bot:**
+
+1. Send the `/set_cookie` command to the bot in a private message.
+2. The bot will ask you to reply with your cookie.
+3. Paste the `ndus` cookie value you copied and send it as a reply.
+
+Once your cookie is set, you can send any Terabox link to the bot to start the download.
 
 ## Environment Variable
 
