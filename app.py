@@ -1,4 +1,6 @@
 from flask import Flask
+import threading
+from bot import Client
 
 app = Flask(__name__)
 
@@ -10,6 +12,13 @@ def hello():
 def health_check():
     return 'OK', 200
 
+def run_bot():
+    Client.run()
+
 if __name__ == '__main__':
-    # Run the Flask app on port 80
-    app.run(host='0.0.0.0', port=80)
+    # Start the bot in a separate thread
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.start()
+
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=8080)
