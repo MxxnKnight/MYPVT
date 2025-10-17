@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from plugins.config import Config
 from plugins.database.database import db
-from plugins.terafetch_utils import TeraFetch
+from plugins.terafetch_v2_utils import TeraFetchV2
 from plugins.dl_button import download_coroutine
 import aiohttp
 import asyncio
@@ -31,33 +31,29 @@ async def handle_cookie_reply(bot, update):
         await db.set_terabox_cookie(update.from_user.id, cookie)
         await update.reply_text("Your Terabox cookie has been saved.")
 
-@Client.on_message(filters.private & filters.regex(r"https?://(?:www\.)?(?:terabox\.com|terabox\.app)\S+"))
+@Client.on_message(filters.private & filters.regex(r"https?://(?:www\.)?(?:terabox\.com|terabox\.app|teraboxlink\.com)\S+"))
 async def terabox_downloader(bot, update):
     logger.info(f"Received terabox link from user {update.from_user.id}: {update.text}")
     cookie = await db.get_terabox_cookie(update.from_user.id)
-    if not cookie:
-        logger.warning(f"User {update.from_user.id} has not set their Terabox cookie.")
-        await update.reply_text("You have not set your Terabox cookie yet. Please use the /set_cookie command to set it.")
-        return
+    # The new method might work even without a cookie, so we don't require it.
+    # We'll pass it if it exists.
 
     sent_message = await update.reply_text("Resolving link, please wait...")
 
     loop = asyncio.get_running_loop()
     try:
-        terafetch = TeraFetch(cookie)
+        terafetch = TeraFetchV2(cookie)
         file_meta = await loop.run_in_executor(None, terafetch.resolve, update.text)
 
-        if "error" in file_meta:
-            await sent_message.edit(f"Error: {file_meta['error']}")
+        if "error" in file_meta or not file_meta.get("dlink"):
+            error_message = file_meta.get("error", "Could not resolve download link.")
+            await sent_message.edit(f"Error: {error_message}")
             return
 
-        download_link = await loop.run_in_executor(None, terafetch.get_download_link, file_meta)
+        download_link = file_meta["dlink"]
+        custom_file_name = file_meta.get("filename", "terabox_download")
 
-        if not download_link:
-            await sent_message.edit("Could not get a downloadable link.")
-            return
-
-        custom_file_name = file_meta["filename"]
+        logger.info(f"Successfully resolved link. Filename: {custom_file_name}, Link: {download_link}")
 
         tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
         if not os.path.isdir(tmp_directory_for_each_user):
@@ -122,4 +118,4 @@ async def terabox_downloader(bot, update):
 
     except Exception as e:
         logger.error(f"An error occurred in terabox_downloader: {e}", exc_info=True)
-        await sent_message.edit("An unexpected error occurred. Please check the logs.")
+        await sent_message.edit("An unexpected error occurred. Please check the logs for details.")
