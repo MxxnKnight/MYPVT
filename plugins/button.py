@@ -1,11 +1,3 @@
-import ssl
-import certifi
-import os
-
-# Set SSL certificate path
-os.environ['SSL_CERT_FILE'] = certifi.where()
-os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-
 # ©️ LISA-KOREA | @LISA_FAN_LK | NT_BOT_CHANNEL
 
 import logging
@@ -99,12 +91,12 @@ async def youtube_dl_call_back(bot, update):
     command_to_exec = [
         "yt-dlp",
         "-c",
+        "--no-check-certificate",
+        "--legacy-server-connect",
+        "--extractor-args", "youtube:player_client=ios,web",
         "--max-filesize", str(Config.TG_MAX_FILE_SIZE),
-        "--embed-subs",
-        "-f", f"{youtube_dl_format}bestvideo+bestaudio/best",
+        "-f", f"{youtube_dl_format}+bestvideo+bestaudio/best",
         "--hls-prefer-ffmpeg",
-        "--cookies", cookies_file,
-        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         youtube_dl_url,
         "-o", download_directory
     ]
@@ -113,13 +105,14 @@ async def youtube_dl_call_back(bot, update):
         command_to_exec = [
             "yt-dlp",
             "-c",
+            "--no-check-certificate",
+            "--legacy-server-connect",
+            "--extractor-args", "youtube:player_client=ios,web",
             "--max-filesize", str(Config.TG_MAX_FILE_SIZE),
             "--bidi-workaround",
             "--extract-audio",
-            "--cookies", cookies_file,
             "--audio-format", youtube_dl_ext,
             "--audio-quality", youtube_dl_format,
-            "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             youtube_dl_url,
             "-o", download_directory
         ]

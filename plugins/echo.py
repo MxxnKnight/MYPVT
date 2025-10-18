@@ -1,11 +1,3 @@
-import ssl
-import certifi
-import os
-
-# Set SSL certificate path
-os.environ['SSL_CERT_FILE'] = certifi.where()
-os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-
 # ©️ LISA-KOREA | @LISA_FAN_LK | NT_BOT_CHANNEL | TG-SORRY
 
 
@@ -126,30 +118,20 @@ async def echo(bot, update):
                 o = entity.offset
                 l = entity.length
                 url = url[o:o + l]
-    if Config.HTTP_PROXY != "":
-        command_to_exec = [
-            "yt-dlp",
-            "--no-warnings",
-            "--allow-dynamic-mpd",
-            "--cookies", cookies_file,
-            "--no-check-certificate",
-            "-j",
-            url,
-            "--proxy", Config.HTTP_PROXY
-        ]
-    else:
-        command_to_exec = [
-            "yt-dlp",
-            "--no-warnings",
-            "--allow-dynamic-mpd",
-            "--cookies", cookies_file,
-            "--no-check-certificate",
-            "-j",
-            url,
-            "--geo-bypass-country",
-            "IN"
 
-        ]
+    command_to_exec = [
+        "yt-dlp",
+        "--no-warnings",
+        "--no-check-certificate",
+        "--legacy-server-connect",
+        "--extractor-args", "youtube:player_client=ios,web",
+        "-j",
+        url
+    ]
+
+    if Config.HTTP_PROXY != "":
+        command_to_exec.extend(["--proxy", Config.HTTP_PROXY])
+
     if youtube_dl_username is not None:
         command_to_exec.append("--username")
         command_to_exec.append(youtube_dl_username)
